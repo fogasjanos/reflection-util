@@ -29,33 +29,6 @@ public class ReflectionUtil {
     }
 
     /**
-     * Sets the field represented by fieldName on the specified object argument to the specified new value.
-     *
-     * @param obj        the object whose field should be modified
-     * @param fieldName  name fo the field
-     * @param fieldValue the new value of the field
-     * @throws FieldNotFoundException           if the field with the specified name is not found.
-     * @throws FieldValueCannotChangedException when the value cannot changed.
-     */
-    public static void setFieldValueForced(@NonNull final Object obj, @NonNull final String fieldName, final Object fieldValue) {
-        Field field = getDeclaredField(obj.getClass(), fieldName);
-        try {
-            field.trySetAccessible();
-            field.setAccessible(true);
-            System.out.println(isFinal(field));
-
-            if (isFinal(field)) {
-                removeFinal(field);
-                System.out.println(isFinal(field));
-            }
-            field.set(obj, fieldValue);
-            System.out.println(obj);
-        } catch (IllegalAccessException e) {
-            throw new FieldValueCannotChangedException(field, fieldValue);
-        }
-    }
-
-    /**
      * Return a Field object.
      *
      * @param type      Class object
@@ -90,7 +63,8 @@ public class ReflectionUtil {
         return Modifier.isFinal(field.getModifiers());
     }
 
-    public static void removeFinal(@NonNull final Field field) {
+    // Note: it should run before the first time we access the field
+    private static void removeFinal(@NonNull final Field field) {
         Field modifiersField = null;
         try {
             modifiersField = Field.class.getDeclaredField("modifiers");

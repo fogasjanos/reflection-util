@@ -1,9 +1,9 @@
 package com.fogas.datarandomizer.core;
 
 import com.fogas.datarandomizer.core.exception.FieldNotFoundException;
+import com.fogas.datarandomizer.core.exception.FieldValueCannotChangedException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -19,32 +19,27 @@ public class ReflectionUtilTest {
 
     @Test
     public void setFieldValue_shouldSetTheFieldValue_whenFieldIsStatic() {
-        final String name = "New Value";
+        final String newValue = "New Value";
         TestClass testClass = new TestClass();
 
-        ReflectionUtil.setFieldValue(testClass, "staticField", name);
+        ReflectionUtil.setFieldValue(testClass, "staticField", newValue);
 
-        assertEquals(name, TestClass.staticField);
+        assertEquals(newValue, TestClass.staticField);
     }
 
-    @Test
-    public void setFieldValue_shouldSetTheFieldValue_whenFieldIsFinalAndStatic() {
-        final String name = "New Value";
-        TestClass testClass = new TestClass();
-
-        ReflectionUtil.setFieldValueForced(testClass, "FINAL_STATIC_FIELD", name);
-        System.out.println(TestClass.FINAL_STATIC_FIELD);
-        assertEquals(name, TestClass.FINAL_STATIC_FIELD);
+    @Test(expected = FieldValueCannotChangedException.class)
+    public void setFieldValue_shouldNotSetTheFieldValue_whenFieldIsFinal() {
+        ReflectionUtil.setFieldValue(new TestClass(), "FINAL_STATIC_FIELD", "new value");
     }
 
     @Test
     public void setFieldValue_shouldSetTheFieldValue_whenFieldIsNotStatic() {
-        final String name = "New Value";
+        final String newValue = "New Value";
         TestClass testClass = new TestClass();
 
-        ReflectionUtil.setFieldValue(testClass, "name", name);
+        ReflectionUtil.setFieldValue(testClass, "name", newValue);
 
-        assertEquals(name, testClass.getName());
+        assertEquals(newValue, testClass.getName());
     }
 
     @Test(expected = FieldNotFoundException.class)
