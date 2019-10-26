@@ -9,11 +9,21 @@ repositories {
 }
 
 dependencies {
-    api("org.slf4j:slf4j-api:1.7.26")
+    val slf4jVersion = "1.7.26"
+    val log4j2Version = "2.12.1"
+    val lombokVersion = "1.18.10"
+    val junitVersion = "4.12"
 
-    implementation("org.slf4j:slf4j-log4j12:1.7.26")
-    implementation("org.apache.logging.log4j:log4j-core:2.12.0")
-    implementation("org.projectlombok:lombok:1.18.10")
+    // logging
+    api("org.slf4j:slf4j-api:$slf4jVersion")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version")
+    api("org.apache.logging.log4j:log4j-api:$log4j2Version")
+    implementation("org.apache.logging.log4j:log4j-core:$log4j2Version")
 
-    testImplementation("junit:junit:4.12")
+    // testing
+    testImplementation("junit:junit:$junitVersion")
+
+    // Lombok
+    testImplementation("org.projectlombok:lombok:$lombokVersion")
+
 }

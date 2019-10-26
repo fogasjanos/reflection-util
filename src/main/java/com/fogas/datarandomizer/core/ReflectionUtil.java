@@ -4,6 +4,7 @@ import com.fogas.datarandomizer.core.exception.FieldNotFoundException;
 import com.fogas.datarandomizer.core.exception.FieldValueCannotChangedException;
 import lombok.NonNull;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -51,6 +52,10 @@ public class ReflectionUtil {
             return getDeclaredField(superType, fieldName);
         }
         return field;
+    }
+
+    public static Constructor<?>[] getDeclaredConstructors(Class<?> type) {
+        return type.getDeclaredConstructors();
     }
 
     /**

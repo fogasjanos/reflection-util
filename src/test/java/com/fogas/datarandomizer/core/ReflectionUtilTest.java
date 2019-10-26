@@ -2,14 +2,19 @@ package com.fogas.datarandomizer.core;
 
 import com.fogas.datarandomizer.core.exception.FieldNotFoundException;
 import com.fogas.datarandomizer.core.exception.FieldValueCannotChangedException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.*;
 
+@Slf4j
 public class ReflectionUtilTest {
 
     @Test(expected = FieldNotFoundException.class)
@@ -96,6 +101,8 @@ public class ReflectionUtilTest {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     static class ParentTestClass {
         protected String parentName;
     }
