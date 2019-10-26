@@ -83,6 +83,22 @@ public class ReflectionUtilTest {
     }
 
     @Test
+    public void getConstructorWithMostParameters_shouldReturnDefaultConstructor_whenThereIsNoConsturctorDeclared() {
+        Constructor<TestClass> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
+
+        assertNotNull(result);
+        assertEquals(0, result.getParameterCount());
+    }
+
+    @Test
+    public void getConstructorWithMostParameters_shouldReturnTheFirstConstructorWithMostParameters() {
+        Constructor result = ReflectionUtil.getConstructorWithMostParameters(ParentTestClass.class);
+
+        assertNotNull(result);
+        assertEquals(2, result.getParameterCount());
+    }
+
+    @Test
     public void isFinal_shouldReturnTrue_whenFieldIsFinal() throws NoSuchFieldException {
         Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
 
@@ -105,6 +121,7 @@ public class ReflectionUtilTest {
     @AllArgsConstructor
     static class ParentTestClass {
         protected String parentName;
+        protected String nonStaticField;
     }
 
     @Getter
@@ -117,5 +134,15 @@ public class ReflectionUtilTest {
         public String toString() {
             return FINAL_STATIC_FIELD;
         }
+    }
+
+    static abstract class TestAbstractClass {
+        protected String abstractClassField;
+
+        public abstract String getHello();
+    }
+
+    interface TestInterface {
+        String sayHello();
     }
 }

@@ -59,6 +59,23 @@ public class ReflectionUtil {
     }
 
     /**
+     * Find the constructor with the most parameters.
+     * @param type Class object
+     * @param <T> type of the Class object
+     * @return the first constructor with the most parameters or the default constructor.
+     */
+    public static <T> Constructor<T> getConstructorWithMostParameters(Class<T> type) {
+        Constructor<?>[] constructors = type.getDeclaredConstructors();
+        Constructor<?> most = null;
+        for (Constructor<?> constructor : constructors) {
+            if (most == null || constructor.getParameterCount() > most.getParameterCount()) {
+                most = constructor;
+            }
+        }
+        return (Constructor<T>) most;
+    }
+
+    /**
      * Check the field is declared as final.
      *
      * @param field field to check
@@ -66,6 +83,14 @@ public class ReflectionUtil {
      */
     public static boolean isFinal(@NonNull final Field field) {
         return Modifier.isFinal(field.getModifiers());
+    }
+
+    public static <T> boolean isAbstract(@NonNull final Class<T> type) {
+        return Modifier.isAbstract(type.getModifiers());
+    }
+
+    public static <T> boolean isInterface(@NonNull final Class<T> type) {
+        return Modifier.isInterface(type.getModifiers());
     }
 
     // Note: it should run before the first time we access the field
