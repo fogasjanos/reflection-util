@@ -1,7 +1,7 @@
-package com.fogas.datarandomizer.core;
+package eu.fogas.reflection;
 
-import com.fogas.datarandomizer.core.exception.FieldNotFoundException;
-import com.fogas.datarandomizer.core.exception.FieldValueCannotChangedException;
+import eu.fogas.reflection.exception.FieldNotFoundException;
+import eu.fogas.reflection.exception.FieldValueCannotChangedException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

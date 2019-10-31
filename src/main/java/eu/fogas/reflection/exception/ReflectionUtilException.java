@@ -1,4 +1,4 @@
-package com.fogas.datarandomizer.core.exception;
+package eu.fogas.reflection.exception;
 
 public class ReflectionUtilException extends RuntimeException {
     static final long serialVersionUID = 1L;

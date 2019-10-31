@@ -1,4 +1,4 @@
-package com.fogas.datarandomizer.core.exception;
+package eu.fogas.reflection.exception;
 
 import java.lang.reflect.Field;
 

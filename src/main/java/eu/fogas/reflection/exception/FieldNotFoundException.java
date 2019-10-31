@@ -1,4 +1,4 @@
-package com.fogas.datarandomizer.core.exception;
+package eu.fogas.reflection.exception;
 
 public class FieldNotFoundException extends ReflectionUtilException {
     static final long serialVersionUID = 1L;
