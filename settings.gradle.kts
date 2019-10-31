@@ -1,1 +1,1 @@
-rootProject.name = "data-randomizer"
+rootProject.name = "reflection-util"
