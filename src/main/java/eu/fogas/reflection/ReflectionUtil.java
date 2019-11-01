@@ -54,6 +54,7 @@ public class ReflectionUtil {
         return field;
     }
 
+    // TODO do we need this?
     public static Constructor<?>[] getDeclaredConstructors(Class<?> type) {
         return type.getDeclaredConstructors();
     }
@@ -85,6 +86,22 @@ public class ReflectionUtil {
         return Modifier.isFinal(field.getModifiers());
     }
 
+    /**
+     * Check the class is declared as final.
+     *
+     * @param type class to check
+     * @return true if the declared class is final
+     */
+    public static boolean isFinal(@NonNull final Class<?> type) {
+        return Modifier.isFinal(type.getModifiers());
+    }
+
+    /**
+     * Check the class is declared as abstract.
+     *
+     * @param type class to check
+     * @return true if the declared type is abstract
+     */
     public static <T> boolean isAbstract(@NonNull final Class<T> type) {
         return Modifier.isAbstract(type.getModifiers());
     }
