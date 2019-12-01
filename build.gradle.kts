@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("io.freefair.lombok") version "3.8.0"
+    id("io.freefair.lombok") version "4.1.5"
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    val slf4jVersion = "1.7.26"
+    val slf4jVersion = "1.7.29"
     val log4j2Version = "2.12.1"
     val lombokVersion = "1.18.10"
     val junitVersion = "4.12"
@@ -25,5 +25,5 @@ dependencies {
 
     // Lombok
     testImplementation("org.projectlombok:lombok:$lombokVersion")
-
 }
+s
