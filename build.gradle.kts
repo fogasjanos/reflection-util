@@ -26,4 +26,3 @@ dependencies {
     // Lombok
     testImplementation("org.projectlombok:lombok:$lombokVersion")
 }
-s
