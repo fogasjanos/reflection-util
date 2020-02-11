@@ -83,6 +83,15 @@ public class ReflectionUtilTest {
     }
 
     @Test
+    public void getDeclaredConstructors_shouldReturnDefaultConstructor_whenThereIsNoExplicitConstuctor() {
+        Constructor<?>[] result = ReflectionUtil.getDeclaredConstructors(TestClass.class);
+
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals(0, result[0].getParameterCount());
+    }
+
+    @Test
     public void getConstructorWithMostParameters_shouldReturnDefaultConstructor_whenThereIsNoConsturctorDeclared() {
         Constructor<TestClass> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
 
@@ -116,6 +125,20 @@ public class ReflectionUtilTest {
         assertFalse(result);
     }
 
+    @Test
+    public void isFinal_shouldReturnTrue_whenClassIsFinal() {
+        boolean result = ReflectionUtil.isFinal(TestFinalClass.class);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void isFinal_shouldReturnFalse_whenClassIsNotFinal() throws NoSuchFieldException {
+        boolean result = ReflectionUtil.isFinal(TestClass.class);
+
+        assertFalse(result);
+    }
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -140,6 +163,9 @@ public class ReflectionUtilTest {
         protected String abstractClassField;
 
         public abstract String getHello();
+    }
+
+    static final class TestFinalClass {
     }
 
     interface TestInterface {

@@ -54,15 +54,21 @@ public class ReflectionUtil {
         return field;
     }
 
-    // TODO do we need this?
+    /**
+     * Return declared constructors array.
+     *
+     * @param type Class object
+     * @return Declared constructors array
+     */
     public static Constructor<?>[] getDeclaredConstructors(Class<?> type) {
         return type.getDeclaredConstructors();
     }
 
     /**
      * Find the constructor with the most parameters.
+     *
      * @param type Class object
-     * @param <T> type of the Class object
+     * @param <T>  type of the Class object
      * @return the first constructor with the most parameters or the default constructor.
      */
     public static <T> Constructor<T> getConstructorWithMostParameters(Class<T> type) {
@@ -110,6 +116,7 @@ public class ReflectionUtil {
         return Modifier.isInterface(type.getModifiers());
     }
 
+    // TODO test this properly
     // Note: it should run before the first time we access the field
     private static void removeFinal(@NonNull final Field field) {
         Field modifiersField = null;
