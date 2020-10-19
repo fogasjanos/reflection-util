@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("io.freefair.lombok") version "4.1.5"
+    id("io.freefair.lombok") version "5.2.1"
 }
 
 repositories {
@@ -9,10 +9,10 @@ repositories {
 }
 
 dependencies {
-    val slf4jVersion = "1.7.29"
-    val log4j2Version = "2.12.1"
-    val lombokVersion = "1.18.10"
-    val junitVersion = "4.12"
+    val slf4jVersion = "1.7.30"
+    val log4j2Version = "2.13.3"
+    val lombokVersion = "1.18.16"
+    val junitVersion = "4.13.1"
 
     // logging
     api("org.slf4j:slf4j-api:$slf4jVersion")
