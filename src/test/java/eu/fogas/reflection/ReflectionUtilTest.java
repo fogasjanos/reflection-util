@@ -93,7 +93,7 @@ public class ReflectionUtilTest {
 
     @Test
     public void getConstructorWithMostParameters_shouldReturnDefaultConstructor_whenThereIsNoConsturctorDeclared() {
-        Constructor<TestClass> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
+        Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
 
         assertNotNull(result);
         assertEquals(0, result.getParameterCount());
@@ -101,7 +101,7 @@ public class ReflectionUtilTest {
 
     @Test
     public void getConstructorWithMostParameters_shouldReturnTheFirstConstructorWithMostParameters() {
-        Constructor result = ReflectionUtil.getConstructorWithMostParameters(ParentTestClass.class);
+        Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(ParentTestClass.class);
 
         assertNotNull(result);
         assertEquals(2, result.getParameterCount());

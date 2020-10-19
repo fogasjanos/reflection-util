@@ -26,3 +26,8 @@ dependencies {
     // Lombok
     testImplementation("org.projectlombok:lombok:$lombokVersion")
 }
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:unchecked")
+    options.setDeprecation(true)
+}

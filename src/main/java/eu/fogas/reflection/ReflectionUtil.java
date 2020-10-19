@@ -68,18 +68,17 @@ public class ReflectionUtil {
      * Find the constructor with the most parameters.
      *
      * @param type Class object
-     * @param <T>  type of the Class object
      * @return the first constructor with the most parameters or the default constructor.
      */
-    public static <T> Constructor<T> getConstructorWithMostParameters(Class<T> type) {
-        Constructor<?>[] constructors = type.getDeclaredConstructors();
+    public static Constructor<?> getConstructorWithMostParameters(Class<?> type) {
+        Constructor<?>[] constructors = getDeclaredConstructors(type);
         Constructor<?> most = null;
         for (Constructor<?> constructor : constructors) {
             if (most == null || constructor.getParameterCount() > most.getParameterCount()) {
                 most = constructor;
             }
         }
-        return (Constructor<T>) most;
+        return most;
     }
 
     /**
