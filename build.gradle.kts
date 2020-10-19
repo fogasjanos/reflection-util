@@ -3,6 +3,17 @@ plugins {
     id("io.freefair.lombok") version "5.2.1"
 }
 
+version="0.0.1"
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(15))
+    }
+
+    withJavadocJar()
+    withSourcesJar()
+}
+
 repositories {
     jcenter()
     mavenCentral()
@@ -27,7 +38,12 @@ dependencies {
     testImplementation("org.projectlombok:lombok:$lombokVersion")
 }
 
-tasks.withType<JavaCompile> {
+tasks.compileJava {
+    options.isIncremental = true
+    options.isFork = true
+    options.isFailOnError = false
     options.compilerArgs.add("-Xlint:unchecked")
-    options.setDeprecation(true)
+    options.isDeprecation = true
+
+    options.release.set(15)
 }
