@@ -1,9 +1,27 @@
 plugins {
     `java-library`
+    `maven-publish`
     id("io.freefair.lombok") version "5.2.1"
 }
 
+group="eu.fogas"
 version="0.0.1"
+
+publishing {
+    publications {
+        create<MavenPublication>("reflectionUtil") {
+            from(components["java"])
+        }
+    }
+
+/*    repositories {
+        maven {
+            name = "myRepo"
+            url = uri("file://${buildDir}/repo")
+        }
+    }
+ */
+}
 
 java {
     toolchain {
