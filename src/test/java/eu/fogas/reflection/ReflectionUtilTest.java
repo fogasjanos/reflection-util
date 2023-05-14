@@ -7,19 +7,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class ReflectionUtilTest {
 
-    @Test(expected = FieldNotFoundException.class)
+    @Test
     public void setFieldValue_shouldThrowFieldNotFoundException_whenFieldNameIsNotValid() {
-        ReflectionUtil.setFieldValue(new TestClass(), "blah", "blahValue");
+        assertThrows(FieldNotFoundException.class, () ->
+                ReflectionUtil.setFieldValue(new TestClass(), "blah", "blahValue"));
     }
 
     @Test
@@ -32,9 +33,10 @@ public class ReflectionUtilTest {
         assertEquals(newValue, TestClass.staticField);
     }
 
-    @Test(expected = FieldValueCannotChangedException.class)
+    @Test
     public void setFieldValue_shouldNotSetTheFieldValue_whenFieldIsFinal() {
-        ReflectionUtil.setFieldValue(new TestClass(), "FINAL_STATIC_FIELD", "new value");
+        assertThrows(FieldValueCannotChangedException.class, () ->
+                ReflectionUtil.setFieldValue(new TestClass(), "FINAL_STATIC_FIELD", "new value"));
     }
 
     @Test
@@ -47,19 +49,22 @@ public class ReflectionUtilTest {
         assertEquals(newValue, testClass.getName());
     }
 
-    @Test(expected = FieldNotFoundException.class)
+    @Test
     public void getDeclaredField_shouldThrowFieldNotFoundException_whenFieldIsNotPresent() {
-        ReflectionUtil.getDeclaredField(TestClass.class, "blah");
+        assertThrows(FieldNotFoundException.class, () ->
+                ReflectionUtil.getDeclaredField(TestClass.class, "blah"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void getDeclaredField_shouldThrowNullPointerException_whenTypeIsNull() {
-        ReflectionUtil.getDeclaredField(null, "blah");
+        assertThrows(NullPointerException.class, () ->
+                ReflectionUtil.getDeclaredField(null, "blah"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void getDeclaredField_shouldThrowNullPointerException_whenFieldNameIsNull() {
-        ReflectionUtil.getDeclaredField(TestClass.class, null);
+        assertThrows(NullPointerException.class, () ->
+                ReflectionUtil.getDeclaredField(TestClass.class, null));
     }
 
     @Test
@@ -133,7 +138,7 @@ public class ReflectionUtilTest {
     }
 
     @Test
-    public void isFinal_shouldReturnFalse_whenClassIsNotFinal() throws NoSuchFieldException {
+    public void isFinal_shouldReturnFalse_whenClassIsNotFinal() {
         boolean result = ReflectionUtil.isFinal(TestClass.class);
 
         assertFalse(result);

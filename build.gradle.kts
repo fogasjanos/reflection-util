@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.freefair.lombok") version "5.2.1"
+    id("io.freefair.lombok") version "8.0.1"
 }
 
 group="eu.fogas"
@@ -25,7 +25,7 @@ publishing {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(15))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 
     withJavadocJar()
@@ -33,27 +33,28 @@ java {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    val slf4jVersion = "1.7.30"
-    val log4j2Version = "2.13.3"
-    val lombokVersion = "1.18.16"
-    val junitVersion = "4.13.1"
+    val slf4jVersion = "2.0.7"
+    val log4j2Version = "2.20.0"
+    val junitVersion = "5.7.1"
 
     // logging
     api("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2Version")
     api("org.apache.logging.log4j:log4j-api:$log4j2Version")
     implementation("org.apache.logging.log4j:log4j-core:$log4j2Version")
 
     // testing
-    testImplementation("junit:junit:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
+}
 
-    // Lombok
-    testImplementation("org.projectlombok:lombok:$lombokVersion")
+tasks {
+    named<Test>("test") {
+        useJUnitPlatform()
+    }
 }
 
 tasks.compileJava {
@@ -63,5 +64,5 @@ tasks.compileJava {
     options.compilerArgs.add("-Xlint:unchecked")
     options.isDeprecation = true
 
-    options.release.set(15)
+    options.release.set(17)
 }

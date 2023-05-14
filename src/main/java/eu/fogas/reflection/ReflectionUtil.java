@@ -2,11 +2,15 @@ package eu.fogas.reflection;
 
 import eu.fogas.reflection.exception.FieldNotFoundException;
 import eu.fogas.reflection.exception.FieldValueCannotChangedException;
+import eu.fogas.reflection.exception.FieldValueCannotReadException;
 import lombok.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ReflectionUtil {
 
@@ -26,6 +30,16 @@ public class ReflectionUtil {
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
             throw new FieldValueCannotChangedException(field, fieldValue);
+        }
+    }
+
+    public static <V> V getFieldValue(@NonNull final Object obj, @NonNull final String fieldName) {
+        Field field = getDeclaredField(obj.getClass(), fieldName);
+        try {
+            field.trySetAccessible();
+            return (V) field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new FieldValueCannotReadException(field);
         }
     }
 
@@ -52,6 +66,22 @@ public class ReflectionUtil {
             return getDeclaredField(superType, fieldName);
         }
         return field;
+    }
+
+    /**
+     * Return all the fields from the class and from all the super classes.
+     *
+     * @param type Class object
+     * @return all the fields from the class and from all the super classes.
+     */
+    public static List<Field> getAllFields(@NonNull final Class<?> type) {
+        List<Field> fields = new ArrayList<>();
+        var t = type;
+        do {
+            fields.addAll(Arrays.asList(t.getDeclaredFields()));
+            t = t.getSuperclass();
+        } while (t != null);
+        return fields;
     }
 
     /**
@@ -102,6 +132,26 @@ public class ReflectionUtil {
     }
 
     /**
+     * Check the field is declared as static.
+     *
+     * @param field field to check
+     * @return true if the declared field is static
+     */
+    public static boolean isStatic(@NonNull final Field field) {
+        return Modifier.isStatic(field.getModifiers());
+    }
+
+    /**
+     * Check the class is declared as static.
+     *
+     * @param type class to check
+     * @return true if the declared class is static
+     */
+    public static boolean isStatic(@NonNull final Class<?> type) {
+        return Modifier.isStatic(type.getModifiers());
+    }
+
+    /**
      * Check the class is declared as abstract.
      *
      * @param type class to check
@@ -111,8 +161,38 @@ public class ReflectionUtil {
         return Modifier.isAbstract(type.getModifiers());
     }
 
+    /**
+     * Check the class is declared as interface.
+     *
+     * @param type class to check
+     * @return true if the declared type is interface
+     */
     public static <T> boolean isInterface(@NonNull final Class<T> type) {
         return Modifier.isInterface(type.getModifiers());
+    }
+
+    /**
+     * Check the class is declared as enum.
+     *
+     * @param type class to check
+     * @return true if the declared type is enum
+     */
+    public static <T> boolean isEnum(@NonNull final Class<T> type) {
+        return isAssignableFrom(Enum.class, type);
+    }
+
+    /**
+     * Check the class is declared as enum.
+     *
+     * @param type class to check
+     * @return true if the declared type is enum
+     */
+    public static <T> boolean isRecord(@NonNull final Class<T> type) {
+        return isAssignableFrom(Record.class, type);
+    }
+
+    private static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
+        return cls.isAssignableFrom(type);
     }
 
     // TODO test this properly
