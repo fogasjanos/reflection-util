@@ -1,27 +1,12 @@
+import org.gradle.internal.impldep.org.apache.maven.model.Build
+
 plugins {
     `java-library`
-    `maven-publish`
     id("io.freefair.lombok") version "8.6"
 }
 
 group="eu.fogas"
-version="1.0.0-SNAPSHOT"
-
-publishing {
-    publications {
-        create<MavenPublication>("reflectionUtil") {
-            from(components["java"])
-        }
-    }
-
-/*    repositories {
-        maven {
-            name = "myRepo"
-            url = uri("file://${buildDir}/repo")
-        }
-    }
- */
-}
+version="1.0.0"
 
 java {
     toolchain {
@@ -54,6 +39,16 @@ dependencies {
 tasks {
     named<Test>("test") {
         useJUnitPlatform()
+    }
+
+    named<Jar>("jar") {
+        manifest {
+            attributes(mapOf("Implementation-Title" to project.name,
+                    "Implementation-Version" to project.version,
+                    "Package" to "eu.fogas.reflection",
+                    "Built-By" to "fogasjanos"))
+        }
+        shouldRunAfter("build")
     }
 }
 
