@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+/**
+ * Helper class to make java's reflection easy and fun to use.
+ */
 public class ReflectionUtil {
 
     /**
@@ -42,6 +45,7 @@ public class ReflectionUtil {
      * @param obj       the object with the field
      * @param fieldName name of the field
      * @return the value of the field with the given name
+     * @param <V> the type of the return value
      */
     public static <V> V getFieldValue(@NonNull final Object obj, @NonNull final String fieldName) {
         Field field = getDeclaredField(obj.getClass(), fieldName);
@@ -169,6 +173,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is abstract
+     * @param <T> the type of the class
      */
     public static <T> boolean isAbstract(@NonNull final Class<T> type) {
         return Modifier.isAbstract(type.getModifiers());
@@ -179,6 +184,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is interface
+     * @param <T> the type of the class
      */
     public static <T> boolean isInterface(@NonNull final Class<T> type) {
         return Modifier.isInterface(type.getModifiers());
@@ -189,6 +195,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is enum
+     * @param <T> the type of the class
      */
     public static <T> boolean isEnum(@NonNull final Class<T> type) {
         return isAssignableFrom(Enum.class, type);
@@ -199,6 +206,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is enum
+     * @param <T> the type of the class
      */
     public static <T> boolean isRecord(@NonNull final Class<T> type) {
         return isAssignableFrom(Record.class, type);
@@ -209,6 +217,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is Set
+     * @param <T> the type of the class
      */
     public static <T> boolean isSet(@NonNull final Class<T> type) {
         return isAssignableFrom(Set.class, type);
@@ -229,6 +238,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is List
+     * @param <T> the type of the class
      */
     public static <T> boolean isList(@NonNull final Class<T> type) {
         return isAssignableFrom(List.class, type);
@@ -249,6 +259,7 @@ public class ReflectionUtil {
      *
      * @param type class to check
      * @return true if the declared type is Map
+     * @param <T> the type of the class
      */
     public static <T> boolean isMap(@NonNull final Class<T> type) {
         return isAssignableFrom(Map.class, type);
@@ -274,7 +285,7 @@ public class ReflectionUtil {
         return field.getType().isArray();
     }
 
-    public static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
+    private static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
         return cls.isAssignableFrom(type);
     }
 
