@@ -11,6 +11,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 public class ReflectionUtil {
 
@@ -26,6 +29,7 @@ public class ReflectionUtil {
     public static void setFieldValue(@NonNull final Object obj, @NonNull final String fieldName, final Object fieldValue) {
         Field field = getDeclaredField(obj.getClass(), fieldName);
         try {
+            // TODO check final
             field.trySetAccessible();
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
@@ -101,14 +105,17 @@ public class ReflectionUtil {
      * @return the first constructor with the most parameters or the default constructor.
      */
     public static Constructor<?> getConstructorWithMostParameters(Class<?> type) {
-        Constructor<?>[] constructors = getDeclaredConstructors(type);
-        Constructor<?> most = null;
-        for (Constructor<?> constructor : constructors) {
-            if (most == null || constructor.getParameterCount() > most.getParameterCount()) {
-                most = constructor;
-            }
-        }
-        return most;
+        return getConstructor(type, (a, b) -> a.getParameterCount() > b.getParameterCount());
+    }
+
+    /**
+     * Find the default constructor.
+     *
+     * @param type Class object
+     * @return the default constructor.
+     */
+    public static Constructor<?> getDefaultConstructor(Class<?> type) {
+        return getConstructor(type, (a, b) -> a.getParameterCount() < b.getParameterCount());
     }
 
     /**
@@ -191,22 +198,88 @@ public class ReflectionUtil {
         return isAssignableFrom(Record.class, type);
     }
 
+    /**
+     * Check the class is declared as Set.
+     *
+     * @param type class to check
+     * @return true if the declared type is Set
+     */
+    public static <T> boolean isSet(@NonNull final Class<T> type) {
+        return isAssignableFrom(Set.class, type);
+    }
+
+    /**
+     * Check the field is a Set.
+     *
+     * @param field field to check
+     * @return true if the declared field is a Set
+     */
+    public static boolean isSet(@NonNull final Field field) {
+        return isSet(field.getType());
+    }
+
+    /**
+     * Check the class is declared as List.
+     *
+     * @param type class to check
+     * @return true if the declared type is List
+     */
+    public static <T> boolean isList(@NonNull final Class<T> type) {
+        return isAssignableFrom(List.class, type);
+    }
+
+    /**
+     * Check the field is a List.
+     *
+     * @param field field to check
+     * @return true if the declared field is a List
+     */
+    public static boolean isList(@NonNull final Field field) {
+        return isList(field.getType());
+    }
+
+    /**
+     * Check the class is declared as Map.
+     *
+     * @param type class to check
+     * @return true if the declared type is Map
+     */
+    public static <T> boolean isMap(@NonNull final Class<T> type) {
+        return isAssignableFrom(Map.class, type);
+    }
+
+    /**
+     * Check the field is a Map.
+     *
+     * @param field field to check
+     * @return true if the declared field is a Map
+     */
+    public static boolean isMap(@NonNull final Field field) {
+        return isMap(field.getType());
+    }
+
+    /**
+     * Check the field is an array.
+     *
+     * @param field field to check
+     * @return true if the declared field is an array
+     */
+    public static boolean isArray(@NonNull final Field field) {
+        return field.getType().isArray();
+    }
+
     private static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
         return cls.isAssignableFrom(type);
     }
 
-    // TODO test this properly
-    // Note: it should run before the first time we access the field
-    private static void removeFinal(@NonNull final Field field) {
-        Field modifiersField = null;
-        try {
-            modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.trySetAccessible();
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        } catch (NoSuchFieldException nsfe) {
-            throw new FieldNotFoundException(Field.class, "modifiers");
-        } catch (IllegalAccessException iae) {
-            throw new FieldValueCannotChangedException(modifiersField, "remove FINAL modifier");
+    private static Constructor<?> getConstructor(Class<?> type, BiFunction<Constructor<?>, Constructor<?>, Boolean> condition) {
+        Constructor<?>[] constructors = getDeclaredConstructors(type);
+        Constructor<?> least = null;
+        for (Constructor<?> constructor : constructors) {
+            if (least == null || condition.apply(constructor, least)) {
+                least = constructor;
+            }
         }
+        return least;
     }
 }
