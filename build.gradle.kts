@@ -1,11 +1,11 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.freefair.lombok") version "8.0.1"
+    id("io.freefair.lombok") version "8.6"
 }
 
 group="eu.fogas"
-version="0.0.1"
+version="1.0.0-SNAPSHOT"
 
 publishing {
     publications {

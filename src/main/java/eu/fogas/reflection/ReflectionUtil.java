@@ -24,12 +24,11 @@ public class ReflectionUtil {
      * @param fieldName  name fo the field
      * @param fieldValue the new value of the field
      * @throws FieldNotFoundException           if the field with the specified name is not found.
-     * @throws FieldValueCannotChangedException when the value cannot changed.
+     * @throws FieldValueCannotChangedException when the value cannot be changed.
      */
     public static void setFieldValue(@NonNull final Object obj, @NonNull final String fieldName, final Object fieldValue) {
         Field field = getDeclaredField(obj.getClass(), fieldName);
         try {
-            // TODO check final
             field.trySetAccessible();
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
@@ -37,6 +36,13 @@ public class ReflectionUtil {
         }
     }
 
+    /**
+     * Return the value of the field of an object
+     *
+     * @param obj       the object with the field
+     * @param fieldName name of the field
+     * @return the value of the field with the given name
+     */
     public static <V> V getFieldValue(@NonNull final Object obj, @NonNull final String fieldName) {
         Field field = getDeclaredField(obj.getClass(), fieldName);
         try {
@@ -48,7 +54,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Return a Field object.
+     * Return the Field object with the declared name.
      *
      * @param type      Class object
      * @param fieldName the simple name of the field
@@ -268,7 +274,7 @@ public class ReflectionUtil {
         return field.getType().isArray();
     }
 
-    private static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
+    public static <T> boolean isAssignableFrom(@NonNull final Class<?> cls, @NonNull final Class<T> type) {
         return cls.isAssignableFrom(type);
     }
 
