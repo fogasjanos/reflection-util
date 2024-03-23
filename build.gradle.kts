@@ -37,9 +37,9 @@ repositories {
 }
 
 dependencies {
-    val slf4jVersion = "2.0.7"
-    val log4j2Version = "2.20.0"
-    val junitVersion = "5.7.1"
+    val slf4jVersion = "2.0.12"
+    val log4j2Version = "2.23.1"
+    val junitVersion = "5.10.2"
 
     // logging
     api("org.slf4j:slf4j-api:$slf4jVersion")
