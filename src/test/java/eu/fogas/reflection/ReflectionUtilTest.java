@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 public class ReflectionUtilTest {
 
     @Test
@@ -300,7 +298,6 @@ public class ReflectionUtilTest {
         assertFalse(result);
     }
 
-
     @Test
     public void isList_shouldReturnTrue_whenFieldIsList() throws NoSuchFieldException {
         Field field = TestTypesClass.class.getDeclaredField("list");
@@ -332,9 +329,6 @@ public class ReflectionUtilTest {
 
         assertFalse(result);
     }
-
-
-
 
     @Test
     public void isMap_shouldReturnTrue_whenFieldIsMap() throws NoSuchFieldException {

@@ -1,12 +1,19 @@
-import org.gradle.internal.impldep.org.apache.maven.model.Build
-
 plugins {
     `java-library`
+    `maven-publish`
     id("io.freefair.lombok") version "8.6"
 }
 
-group="eu.fogas"
-version="1.0.0"
+group = "eu.fogas"
+version = "1.0.0"
+
+publishing {
+    publications {
+        create<MavenPublication>("reflectionUtil") {
+            from(components["java"])
+        }
+    }
+}
 
 java {
     toolchain {
@@ -19,18 +26,11 @@ java {
 
 repositories {
     mavenCentral()
+    maven(url="https://jitpack.io")
 }
 
 dependencies {
-    val slf4jVersion = "2.0.12"
-    val log4j2Version = "2.23.1"
     val junitVersion = "5.10.2"
-
-    // logging
-    api("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4j2Version")
-    api("org.apache.logging.log4j:log4j-api:$log4j2Version")
-    implementation("org.apache.logging.log4j:log4j-core:$log4j2Version")
 
     // testing
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
@@ -50,14 +50,19 @@ tasks {
         }
         shouldRunAfter("build")
     }
-}
 
-tasks.compileJava {
-    options.isIncremental = true
-    options.isFork = true
-    options.isFailOnError = false
-    options.compilerArgs.add("-Xlint:unchecked")
-    options.isDeprecation = true
+    named<JavaCompile>("compileJava") {
+        options.isIncremental = true
+        options.isFork = true
+        options.isFailOnError = false
+        options.compilerArgs.add("-Xlint:unchecked")
+        options.isDeprecation = true
 
-    options.release.set(17)
+        options.release.set(17)
+    }
+
+    named<Wrapper>("wrapper") {
+        version = 8.7
+        distributionType = Wrapper.DistributionType.BIN
+    }
 }
