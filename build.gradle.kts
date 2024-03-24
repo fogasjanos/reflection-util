@@ -10,7 +10,17 @@ version = "1.0.0"
 publishing {
     publications {
         create<MavenPublication>("reflectionUtil") {
+            artifactId = "reflection-util"
             from(components["java"])
+
+            versionMapping {
+                usage("java-api") {
+                    fromResolutionOf("runtimeClasspath")
+                }
+                usage("java-runtime") {
+                    fromResolutionResult()
+                }
+            }
         }
     }
 }
