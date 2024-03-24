@@ -1,4 +1,6 @@
-package eu.fogas.reflection.exception;
+package eu.fogas.reflection.exception.field;
+
+import eu.fogas.reflection.exception.ReflectionUtilException;
 
 import java.io.Serial;
 import java.lang.reflect.Field;

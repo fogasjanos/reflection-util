@@ -17,4 +17,14 @@ public class ReflectionUtilException extends RuntimeException {
     public ReflectionUtilException(String message) {
         super(message);
     }
+
+    /**
+     * Constructs an exception with the specified detail message.
+     *
+     * @param message – the detail message.
+     * @param cause - the cause.
+     */
+    public ReflectionUtilException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

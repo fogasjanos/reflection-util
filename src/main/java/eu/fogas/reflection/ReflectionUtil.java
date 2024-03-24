@@ -1,12 +1,14 @@
 package eu.fogas.reflection;
 
-import eu.fogas.reflection.exception.FieldNotFoundException;
-import eu.fogas.reflection.exception.FieldValueCannotChangedException;
-import eu.fogas.reflection.exception.FieldValueCannotReadException;
+import eu.fogas.reflection.exception.field.FieldNotFoundException;
+import eu.fogas.reflection.exception.field.FieldValueCannotChangedException;
+import eu.fogas.reflection.exception.field.FieldValueCannotReadException;
+import eu.fogas.reflection.exception.operation.InitializationException;
 import lombok.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +46,8 @@ public class ReflectionUtil {
      *
      * @param obj       the object with the field
      * @param fieldName name of the field
+     * @param <V>       the type of the return value
      * @return the value of the field with the given name
-     * @param <V> the type of the return value
      */
     public static <V> V getFieldValue(@NonNull final Object obj, @NonNull final String fieldName) {
         Field field = getDeclaredField(obj.getClass(), fieldName);
@@ -129,6 +131,21 @@ public class ReflectionUtil {
     }
 
     /**
+     * Creates a new instance of the given type with the default constructor.
+     * @param type Class object
+     * @return a new instance of the given type
+     * @param <T> the type of the return value
+     */
+    public static <T> T newInstance(Class<T> type) {
+        try {
+            return (T) getDefaultConstructor(type).newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            var msg = String.format("Could not create instance of %s because %s", type.getCanonicalName(), e.getMessage());
+            throw new InitializationException(msg, e);
+        }
+    }
+
+    /**
      * Check the field is declared as final.
      *
      * @param field field to check
@@ -172,8 +189,8 @@ public class ReflectionUtil {
      * Check the class is declared as abstract.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is abstract
-     * @param <T> the type of the class
      */
     public static <T> boolean isAbstract(@NonNull final Class<T> type) {
         return Modifier.isAbstract(type.getModifiers());
@@ -183,8 +200,8 @@ public class ReflectionUtil {
      * Check the class is declared as interface.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is interface
-     * @param <T> the type of the class
      */
     public static <T> boolean isInterface(@NonNull final Class<T> type) {
         return Modifier.isInterface(type.getModifiers());
@@ -194,8 +211,8 @@ public class ReflectionUtil {
      * Check the class is declared as enum.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is enum
-     * @param <T> the type of the class
      */
     public static <T> boolean isEnum(@NonNull final Class<T> type) {
         return isAssignableFrom(Enum.class, type);
@@ -205,8 +222,8 @@ public class ReflectionUtil {
      * Check the class is declared as enum.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is enum
-     * @param <T> the type of the class
      */
     public static <T> boolean isRecord(@NonNull final Class<T> type) {
         return isAssignableFrom(Record.class, type);
@@ -216,8 +233,8 @@ public class ReflectionUtil {
      * Check the class is declared as Set.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is Set
-     * @param <T> the type of the class
      */
     public static <T> boolean isSet(@NonNull final Class<T> type) {
         return isAssignableFrom(Set.class, type);
@@ -237,8 +254,8 @@ public class ReflectionUtil {
      * Check the class is declared as List.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is List
-     * @param <T> the type of the class
      */
     public static <T> boolean isList(@NonNull final Class<T> type) {
         return isAssignableFrom(List.class, type);
@@ -258,8 +275,8 @@ public class ReflectionUtil {
      * Check the class is declared as Map.
      *
      * @param type class to check
+     * @param <T>  the type of the class
      * @return true if the declared type is Map
-     * @param <T> the type of the class
      */
     public static <T> boolean isMap(@NonNull final Class<T> type) {
         return isAssignableFrom(Map.class, type);

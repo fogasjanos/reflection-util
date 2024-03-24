@@ -1,7 +1,7 @@
 package eu.fogas.reflection;
 
-import eu.fogas.reflection.exception.FieldNotFoundException;
-import eu.fogas.reflection.exception.FieldValueCannotChangedException;
+import eu.fogas.reflection.exception.field.FieldNotFoundException;
+import eu.fogas.reflection.exception.field.FieldValueCannotChangedException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
