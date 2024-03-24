@@ -27,7 +27,8 @@ publishing {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.ADOPTIUM
     }
 
     withJavadocJar()
@@ -36,7 +37,7 @@ java {
 
 repositories {
     mavenCentral()
-    maven(url="https://jitpack.io")
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
