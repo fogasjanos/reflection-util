@@ -42,8 +42,11 @@ repositories {
 dependencies {
     val junitVersion = "5.10.2"
 
+    annotationProcessor("org.projectlombok:lombok")
+
     // testing
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
+    testAnnotationProcessor("org.projectlombok:lombok")
 }
 
 tasks {
