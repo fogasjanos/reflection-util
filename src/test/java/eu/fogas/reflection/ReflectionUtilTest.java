@@ -147,6 +147,15 @@ public class ReflectionUtilTest {
     }
 
     @Test
+    public void newInstance_shouldReturnNewInstance() {
+        var result = ReflectionUtil.newInstance(TestNonStaticNonFinalInnerClass.class);
+        new TestNonStaticNonFinalInnerClass();
+
+        assertNotNull(result);
+        assertTrue(result instanceof TestNonStaticNonFinalInnerClass);
+    }
+
+    @Test
     public void isFinal_shouldReturnTrue_whenFieldIsFinal() throws NoSuchFieldException {
         Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
 

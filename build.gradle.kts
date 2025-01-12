@@ -1,11 +1,10 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.freefair.lombok") version "8.6"
 }
 
 group = "eu.fogas"
-version = "0.1.0"
+version = "0.1.1"
 
 publishing {
     publications {
@@ -41,13 +40,18 @@ repositories {
 }
 
 dependencies {
-    val junitVersion = "5.10.2"
-
-    annotationProcessor("org.projectlombok:lombok")
+    val lombokVersion: String by project
+    val junitVersion: String by project
 
     // testing
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
     testAnnotationProcessor("org.projectlombok:lombok")
+
+    // lombok
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
 }
 
 tasks {

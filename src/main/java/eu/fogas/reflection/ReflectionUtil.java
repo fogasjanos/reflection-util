@@ -10,12 +10,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
+import java.util.random.RandomGenerator;
 
 /**
  * Helper class to make java's reflection easy and fun to use.
@@ -132,13 +129,33 @@ public class ReflectionUtil {
 
     /**
      * Creates a new instance of the given type with the default constructor.
+     *
      * @param type Class object
+     * @param <T>  the type of the return value
      * @return a new instance of the given type
-     * @param <T> the type of the return value
      */
     public static <T> T newInstance(Class<T> type) {
         try {
             return (T) getDefaultConstructor(type).newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            var msg = String.format("Could not create instance of %s because %s", type.getCanonicalName(), e.getMessage());
+            throw new InitializationException(msg, e);
+        }
+    }
+
+    public static <T> T newInstance(Class<T> type, Object... initargs) {
+        try {
+            Class<?>[] paramTypes = Arrays.stream(initargs)
+                    .map(Object::getClass)
+                    .toArray(size -> new Class<?>[initargs.length]);
+
+            return (T) Arrays.stream(type.getDeclaredConstructors())
+                    .filter(con -> con.getParameterCount() == 1
+                            && Arrays.equals(paramTypes, con.getParameterTypes()))
+                    .findFirst()
+                    .orElseThrow(() -> new InitializationException(
+                            String.format("Could not create instance of %s because not suitable constructor was found", type.getCanonicalName())))
+                    .newInstance(initargs);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             var msg = String.format("Could not create instance of %s because %s", type.getCanonicalName(), e.getMessage());
             throw new InitializationException(msg, e);
