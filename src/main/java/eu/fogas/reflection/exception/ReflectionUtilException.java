@@ -19,7 +19,7 @@ public class ReflectionUtilException extends RuntimeException {
     }
 
     /**
-     * Constructs an exception with the specified detail message.
+     * Constructs an exception with the specified detail message and with the cause.
      *
      * @param message – the detail message.
      * @param cause - the cause.

@@ -143,6 +143,14 @@ public class ReflectionUtil {
         }
     }
 
+    /**
+     * Creates a new instance of the given type with the matching constructor.
+     *
+     * @param type Class object
+     * @param initargs initial parameters for the constructor
+     * @param <T>  the type of the return value
+     * @return a new instance of the given type
+     */
     public static <T> T newInstance(Class<T> type, Object... initargs) {
         try {
             Class<?>[] paramTypes = Arrays.stream(initargs)
