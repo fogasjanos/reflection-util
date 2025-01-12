@@ -2,6 +2,7 @@ package eu.fogas.reflection;
 
 import eu.fogas.reflection.exception.field.FieldNotFoundException;
 import eu.fogas.reflection.exception.field.FieldValueCannotChangedException;
+import eu.fogas.reflection.exception.operation.InitializationException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,418 +19,469 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReflectionUtilTest {
 
-    @Test
-    public void setFieldValue_shouldThrowFieldNotFoundException_whenFieldNameIsNotValid() {
-        assertThrows(FieldNotFoundException.class, () ->
-                ReflectionUtil.setFieldValue(new TestClass(), "blah", "blahValue"));
-    }
-
-    @Test
-    public void setFieldValue_shouldSetTheFieldValue_whenFieldIsStatic() {
-        final String newValue = "New Value";
-        TestClass testClass = new TestClass();
-
-        ReflectionUtil.setFieldValue(testClass, "staticField", newValue);
+	@Test
+	void setFieldValue_shouldThrowFieldNotFoundException_whenFieldNameIsNotValid() {
+		assertThrows(FieldNotFoundException.class, () ->
+				ReflectionUtil.setFieldValue(new TestClass(), "blah", "blahValue"));
+	}
+
+	@Test
+	void setFieldValue_shouldSetTheFieldValue_whenFieldIsStatic() {
+		final String newValue = "New Value";
+		TestClass testClass = new TestClass();
+
+		ReflectionUtil.setFieldValue(testClass, "staticField", newValue);
 
-        assertEquals(newValue, TestClass.staticField);
-    }
-
-    @Test
-    public void setFieldValue_shouldNotSetTheFieldValue_whenFieldIsFinal() {
-        assertThrows(FieldValueCannotChangedException.class, () ->
-                ReflectionUtil.setFieldValue(new TestClass(), "FINAL_STATIC_FIELD", "new value"));
-    }
-
-    @Test
-    public void setFieldValue_shouldSetTheFieldValue_whenFieldIsNotStatic() {
-        final String newValue = "New Value";
-        TestClass testClass = new TestClass();
-
-        ReflectionUtil.setFieldValue(testClass, "name", newValue);
+		assertEquals(newValue, TestClass.staticField);
+	}
+
+	@Test
+	void setFieldValue_shouldNotSetTheFieldValue_whenFieldIsFinal() {
+		assertThrows(FieldValueCannotChangedException.class, () ->
+				ReflectionUtil.setFieldValue(new TestClass(), "FINAL_STATIC_FIELD", "new value"));
+	}
+
+	@Test
+	void setFieldValue_shouldSetTheFieldValue_whenFieldIsNotStatic() {
+		final String newValue = "New Value";
+		TestClass testClass = new TestClass();
+
+		ReflectionUtil.setFieldValue(testClass, "name", newValue);
 
-        assertEquals(newValue, testClass.getName());
-    }
+		assertEquals(newValue, testClass.getName());
+	}
 
-    @Test
-    public void getFieldValue_shouldReturnTheFieldValue_whenFieldAccessible() {
-        TestClass testClass = new TestClass();
+	@Test
+	void getFieldValue_shouldReturnTheFieldValue_whenFieldAccessible() {
+		TestClass testClass = new TestClass();
 
-        var result = ReflectionUtil.getFieldValue(testClass, "name");
+		var result = ReflectionUtil.getFieldValue(testClass, "name");
 
-        assertEquals(testClass.getName(), result);
-    }
+		assertEquals(testClass.getName(), result);
+	}
 
-    @Test
-    public void getDeclaredField_shouldThrowFieldNotFoundException_whenFieldIsNotPresent() {
-        assertThrows(FieldNotFoundException.class, () ->
-                ReflectionUtil.getDeclaredField(TestClass.class, "blah"));
-    }
+	@Test
+	void getDeclaredField_shouldThrowFieldNotFoundException_whenFieldIsNotPresent() {
+		assertThrows(FieldNotFoundException.class, () ->
+				ReflectionUtil.getDeclaredField(TestClass.class, "blah"));
+	}
 
-    @Test
-    public void getDeclaredField_shouldThrowNullPointerException_whenTypeIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                ReflectionUtil.getDeclaredField(null, "blah"));
-    }
+	@Test
+	void getDeclaredField_shouldThrowNullPointerException_whenTypeIsNull() {
+		assertThrows(NullPointerException.class, () ->
+				ReflectionUtil.getDeclaredField(null, "blah"));
+	}
 
-    @Test
-    public void getDeclaredField_shouldThrowNullPointerException_whenFieldNameIsNull() {
-        assertThrows(NullPointerException.class, () ->
-                ReflectionUtil.getDeclaredField(TestClass.class, null));
-    }
+	@Test
+	void getDeclaredField_shouldThrowNullPointerException_whenFieldNameIsNull() {
+		assertThrows(NullPointerException.class, () ->
+				ReflectionUtil.getDeclaredField(TestClass.class, null));
+	}
 
-    @Test
-    public void getDeclaredField_shouldReturnField_whenFieldIsPresent() throws NoSuchFieldException {
-        String fieldName = "name";
+	@Test
+	void getDeclaredField_shouldReturnField_whenFieldIsPresent() throws NoSuchFieldException {
+		String fieldName = "name";
 
-        Field result = ReflectionUtil.getDeclaredField(TestClass.class, fieldName);
+		Field result = ReflectionUtil.getDeclaredField(TestClass.class, fieldName);
 
-        Field expected = TestClass.class.getDeclaredField(fieldName);
-        assertEquals(expected, result);
-    }
+		Field expected = TestClass.class.getDeclaredField(fieldName);
+		assertEquals(expected, result);
+	}
 
-    @Test
-    public void getDeclaredField_shouldReturnField_whenFieldIsPresentInParent() throws NoSuchFieldException {
-        String fieldName = "parentName";
+	@Test
+	void getDeclaredField_shouldReturnField_whenFieldIsPresentInParent() throws NoSuchFieldException {
+		String fieldName = "parentName";
 
-        Field result = ReflectionUtil.getDeclaredField(TestClass.class, fieldName);
+		Field result = ReflectionUtil.getDeclaredField(TestClass.class, fieldName);
 
-        Field expected = ParentTestClass.class.getDeclaredField(fieldName);
-        assertEquals(expected, result);
-    }
+		Field expected = ParentTestClass.class.getDeclaredField(fieldName);
+		assertEquals(expected, result);
+	}
 
-    @Test
-    public void getDeclaredField_shouldReturnAllFieldsEvenFromParent() throws NoSuchFieldException {
-        var expected = Set.of("nonStaticField", "FINAL_STATIC_FIELD", "parentName", "name", "staticField");
+	@Test
+	void getDeclaredField_shouldReturnAllFieldsEvenFromParent() throws NoSuchFieldException {
+		var expected = Set.of("nonStaticField", "FINAL_STATIC_FIELD", "parentName", "name", "staticField");
 
-        var result = ReflectionUtil.getAllFields(TestClass.class);
+		var result = ReflectionUtil.getAllFields(TestClass.class);
 
-        var fieldNames = result.stream()
-                .map(Field::getName)
-                .collect(Collectors.toSet());
-        assertEquals(expected, fieldNames);
-    }
+		var fieldNames = result.stream()
+				.map(Field::getName)
+				.collect(Collectors.toSet());
+		assertEquals(expected, fieldNames);
+	}
 
-    @Test
-    public void getDeclaredConstructors_shouldReturnDefaultConstructor_whenThereIsNoExplicitConstuctor() {
-        Constructor<?>[] result = ReflectionUtil.getDeclaredConstructors(TestClass.class);
+	@Test
+	void getDeclaredConstructors_shouldReturnDefaultConstructor_whenThereIsNoExplicitConstuctor() {
+		Constructor<?>[] result = ReflectionUtil.getDeclaredConstructors(TestClass.class);
 
-        assertNotNull(result);
-        assertEquals(1, result.length);
-        assertEquals(0, result[0].getParameterCount());
-    }
+		assertNotNull(result);
+		assertEquals(1, result.length);
+		assertEquals(0, result[0].getParameterCount());
+	}
 
-    @Test
-    public void getConstructorWithMostParameters_shouldReturnDefaultConstructor_whenThereIsNoConsturctorDeclared() {
-        Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
+	@Test
+	void getConstructorWithMostParameters_shouldReturnDefaultConstructor_whenThereIsNoConsturctorDeclared() {
+		Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(TestClass.class);
 
-        assertNotNull(result);
-        assertEquals(0, result.getParameterCount());
-    }
+		assertNotNull(result);
+		assertEquals(0, result.getParameterCount());
+	}
 
-    @Test
-    public void getConstructorWithMostParameters_shouldReturnTheFirstConstructorWithMostParameters() {
-        Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(ParentTestClass.class);
+	@Test
+	void getConstructorWithMostParameters_shouldReturnTheFirstConstructorWithMostParameters() {
+		Constructor<?> result = ReflectionUtil.getConstructorWithMostParameters(ParentTestClass.class);
 
-        assertNotNull(result);
-        assertEquals(2, result.getParameterCount());
-    }
+		assertNotNull(result);
+		assertEquals(2, result.getParameterCount());
+	}
 
-    @Test
-    public void getDefaultConstructor_shouldReturnTheConstructorWithoutAnyParams() {
-        Constructor<?> result = ReflectionUtil.getDefaultConstructor(ParentTestClass.class);
+	@Test
+	void getDefaultConstructor_shouldReturnTheConstructorWithoutAnyParams() {
+		Constructor<?> result = ReflectionUtil.getDefaultConstructor(ParentTestClass.class);
 
-        assertNotNull(result);
-        assertEquals(0, result.getParameterCount());
-    }
+		assertNotNull(result);
+		assertEquals(0, result.getParameterCount());
+	}
 
-    @Test
-    public void isFinal_shouldReturnTrue_whenFieldIsFinal() throws NoSuchFieldException {
-        Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
+	@Test
+	void newInstance_shouldReturnNewInstanceWithInjectedParameters_whenFound() {
+		var param = "salala";
 
-        boolean result = ReflectionUtil.isFinal(field);
+		var result = ReflectionUtil.newInstance(TestParam.class, param);
 
-        assertTrue(result);
-    }
+		assertEquals(param, result.getParam());
+	}
 
-    @Test
-    public void isFinal_shouldReturnFalse_whenFieldIsNotFinal() throws NoSuchFieldException {
-        Field field = TestClass.class.getDeclaredField("name");
+	@Test
+	void newInstance_shouldReturnNewInstanceWithInjectedInterfaceImplParameters_whenFound() {
+		var param = new TestInterfaceImpl();
 
-        boolean result = ReflectionUtil.isFinal(field);
+		var result = ReflectionUtil.newInstance(TestInterfaceParam.class, param);
 
-        assertFalse(result);
-    }
+		assertEquals(param, result.getParam());
+	}
 
-    @Test
-    public void isFinal_shouldReturnTrue_whenClassIsFinal() {
-        boolean result = ReflectionUtil.isFinal(TestFinalClass.class);
+	@Test
+	void newInstance_shouldThrowInitializationException_whenConstructorWithGivenParamsWasNotFound() {
+		var e = assertThrows(InitializationException.class, () ->
+				ReflectionUtil.newInstance(TestParam.class, 0L));
 
-        assertTrue(result);
-    }
+		assertEquals("Could not create instance of eu.fogas.reflection.ReflectionUtilTest.TestParam because no" +
+				" suitable constructor was found", e.getMessage());
+	}
 
-    @Test
-    public void isFinal_shouldReturnFalse_whenClassIsNotFinal() {
-        boolean result = ReflectionUtil.isFinal(TestClass.class);
+	@Test
+	void isFinal_shouldReturnTrue_whenFieldIsFinal() throws NoSuchFieldException {
+		Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
 
-        assertFalse(result);
-    }
+		boolean result = ReflectionUtil.isFinal(field);
 
-    @Test
-    public void isStatic_shouldReturnTrue_whenFieldIsStatic() throws NoSuchFieldException {
-        Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
+		assertTrue(result);
+	}
 
-        boolean result = ReflectionUtil.isStatic(field);
+	@Test
+	void isFinal_shouldReturnFalse_whenFieldIsNotFinal() throws NoSuchFieldException {
+		Field field = TestClass.class.getDeclaredField("name");
 
-        assertTrue(result);
-    }
+		boolean result = ReflectionUtil.isFinal(field);
 
-    @Test
-    public void isStatic_shouldReturnFalse_whenFieldIsNotStatic() throws NoSuchFieldException {
-        Field field = TestClass.class.getDeclaredField("name");
+		assertFalse(result);
+	}
 
-        boolean result = ReflectionUtil.isStatic(field);
+	@Test
+	void isFinal_shouldReturnTrue_whenClassIsFinal() {
+		boolean result = ReflectionUtil.isFinal(TestFinalClass.class);
 
-        assertFalse(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isStatic_shouldReturnTrue_whenClassIsStatic() {
-        boolean result = ReflectionUtil.isStatic(TestFinalClass.class);
+	@Test
+	void isFinal_shouldReturnFalse_whenClassIsNotFinal() {
+		boolean result = ReflectionUtil.isFinal(TestClass.class);
 
-        assertTrue(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isStatic_shouldReturnFalse_whenClassIsNotStatic() {
-        boolean result = ReflectionUtil.isStatic(TestNonStaticNonFinalInnerClass.class);
+	@Test
+	void isStatic_shouldReturnTrue_whenFieldIsStatic() throws NoSuchFieldException {
+		Field field = TestClass.class.getDeclaredField("FINAL_STATIC_FIELD");
 
-        assertFalse(result);
-    }
+		boolean result = ReflectionUtil.isStatic(field);
 
-    @Test
-    public void isAbstract_shouldReturnTrue_whenClassIsAbstract() {
-        boolean result = ReflectionUtil.isAbstract(TestAbstractClass.class);
+		assertTrue(result);
+	}
 
-        assertTrue(result);
-    }
+	@Test
+	void isStatic_shouldReturnFalse_whenFieldIsNotStatic() throws NoSuchFieldException {
+		Field field = TestClass.class.getDeclaredField("name");
 
-    @Test
-    public void isAbstract_shouldReturnFalse_whenClassIsNotAbstract() {
-        boolean result = ReflectionUtil.isAbstract(TestClass.class);
+		boolean result = ReflectionUtil.isStatic(field);
 
-        assertFalse(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isInterface_shouldReturnTrue_whenClassIsInterface() {
-        boolean result = ReflectionUtil.isInterface(TestInterface.class);
+	@Test
+	void isStatic_shouldReturnTrue_whenClassIsStatic() {
+		boolean result = ReflectionUtil.isStatic(TestFinalClass.class);
 
-        assertTrue(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isInterface_shouldReturnFalse_whenClassIsNotInterface() {
-        boolean result = ReflectionUtil.isInterface(TestClass.class);
+	@Test
+	void isStatic_shouldReturnFalse_whenClassIsNotStatic() {
+		boolean result = ReflectionUtil.isStatic(TestNonStaticNonFinalInnerClass.class);
 
-        assertFalse(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isEnum_shouldReturnTrue_whenClassIsEnum() {
-        boolean result = ReflectionUtil.isEnum(TestEnum.class);
+	@Test
+	void isAbstract_shouldReturnTrue_whenClassIsAbstract() {
+		boolean result = ReflectionUtil.isAbstract(TestAbstractClass.class);
 
-        assertTrue(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isEnum_shouldReturnFalse_whenClassIsNotEnum() {
-        boolean result = ReflectionUtil.isInterface(TestClass.class);
+	@Test
+	void isAbstract_shouldReturnFalse_whenClassIsNotAbstract() {
+		boolean result = ReflectionUtil.isAbstract(TestClass.class);
 
-        assertFalse(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isRecord_shouldReturnTrue_whenClassIsRecord() {
-        boolean result = ReflectionUtil.isRecord(TestRecord.class);
+	@Test
+	void isInterface_shouldReturnTrue_whenClassIsInterface() {
+		boolean result = ReflectionUtil.isInterface(TestInterface.class);
 
-        assertTrue(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isRecord_shouldReturnFalse_whenClassIsNotRecord() {
-        boolean result = ReflectionUtil.isRecord(TestClass.class);
+	@Test
+	void isInterface_shouldReturnFalse_whenClassIsNotInterface() {
+		boolean result = ReflectionUtil.isInterface(TestClass.class);
 
-        assertFalse(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isSet_shouldReturnTrue_whenFieldIsSet() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("set");
+	@Test
+	void isEnum_shouldReturnTrue_whenClassIsEnum() {
+		boolean result = ReflectionUtil.isEnum(TestEnum.class);
 
-        boolean result = ReflectionUtil.isSet(field);
+		assertTrue(result);
+	}
 
-        assertTrue(result);
-    }
+	@Test
+	void isEnum_shouldReturnFalse_whenClassIsNotEnum() {
+		boolean result = ReflectionUtil.isInterface(TestClass.class);
 
-    @Test
-    public void isSet_shouldReturnFalse_whenFieldIsNotSet() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("string");
+		assertFalse(result);
+	}
 
-        boolean result = ReflectionUtil.isSet(field);
+	@Test
+	void isRecord_shouldReturnTrue_whenClassIsRecord() {
+		boolean result = ReflectionUtil.isRecord(TestRecord.class);
 
-        assertFalse(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isSet_shouldReturnTrue_whenClassIsSet() {
-        boolean result = ReflectionUtil.isSet(HashSet.class);
+	@Test
+	void isRecord_shouldReturnFalse_whenClassIsNotRecord() {
+		boolean result = ReflectionUtil.isRecord(TestClass.class);
 
-        assertTrue(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isSet_shouldReturnFalse_whenClassIsNotSet() {
-        boolean result = ReflectionUtil.isSet(TestClass.class);
+	@Test
+	void isSet_shouldReturnTrue_whenFieldIsSet() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("set");
 
-        assertFalse(result);
-    }
+		boolean result = ReflectionUtil.isSet(field);
 
-    @Test
-    public void isList_shouldReturnTrue_whenFieldIsList() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("list");
+		assertTrue(result);
+	}
 
-        boolean result = ReflectionUtil.isList(field);
+	@Test
+	void isSet_shouldReturnFalse_whenFieldIsNotSet() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("string");
 
-        assertTrue(result);
-    }
+		boolean result = ReflectionUtil.isSet(field);
 
-    @Test
-    public void isList_shouldReturnFalse_whenFieldIsNotList() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("string");
+		assertFalse(result);
+	}
 
-        boolean result = ReflectionUtil.isList(field);
+	@Test
+	void isSet_shouldReturnTrue_whenClassIsSet() {
+		boolean result = ReflectionUtil.isSet(HashSet.class);
 
-        assertFalse(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isList_shouldReturnTrue_whenClassIsList() {
-        boolean result = ReflectionUtil.isList(ArrayList.class);
+	@Test
+	void isSet_shouldReturnFalse_whenClassIsNotSet() {
+		boolean result = ReflectionUtil.isSet(TestClass.class);
 
-        assertTrue(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isList_shouldReturnFalse_whenClassIsNotList() {
-        boolean result = ReflectionUtil.isList(TestClass.class);
+	@Test
+	void isList_shouldReturnTrue_whenFieldIsList() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("list");
 
-        assertFalse(result);
-    }
+		boolean result = ReflectionUtil.isList(field);
 
-    @Test
-    public void isMap_shouldReturnTrue_whenFieldIsMap() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("map");
+		assertTrue(result);
+	}
 
-        boolean result = ReflectionUtil.isMap(field);
+	@Test
+	void isList_shouldReturnFalse_whenFieldIsNotList() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("string");
 
-        assertTrue(result);
-    }
+		boolean result = ReflectionUtil.isList(field);
 
-    @Test
-    public void isMap_shouldReturnFalse_whenFieldIsNotMap() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("string");
+		assertFalse(result);
+	}
 
-        boolean result = ReflectionUtil.isMap(field);
+	@Test
+	void isList_shouldReturnTrue_whenClassIsList() {
+		boolean result = ReflectionUtil.isList(ArrayList.class);
 
-        assertFalse(result);
-    }
+		assertTrue(result);
+	}
 
-    @Test
-    public void isMap_shouldReturnTrue_whenClassIsMap() {
-        boolean result = ReflectionUtil.isMap(HashMap.class);
+	@Test
+	void isList_shouldReturnFalse_whenClassIsNotList() {
+		boolean result = ReflectionUtil.isList(TestClass.class);
 
-        assertTrue(result);
-    }
+		assertFalse(result);
+	}
 
-    @Test
-    public void isMap_shouldReturnFalse_whenClassIsNotMap() {
-        boolean result = ReflectionUtil.isMap(TestClass.class);
+	@Test
+	void isMap_shouldReturnTrue_whenFieldIsMap() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("map");
 
-        assertFalse(result);
-    }
+		boolean result = ReflectionUtil.isMap(field);
 
-    @Test
-    public void isArray_shouldReturnTrue_whenFieldIsArray() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("ints");
+		assertTrue(result);
+	}
 
-        boolean result = ReflectionUtil.isArray(field);
+	@Test
+	void isMap_shouldReturnFalse_whenFieldIsNotMap() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("string");
 
-        assertTrue(result);
-    }
+		boolean result = ReflectionUtil.isMap(field);
 
-    @Test
-    public void isArray_shouldReturnFalse_whenFieldIsNotArray() throws NoSuchFieldException {
-        Field field = TestTypesClass.class.getDeclaredField("string");
+		assertFalse(result);
+	}
 
-        boolean result = ReflectionUtil.isArray(field);
+	@Test
+	void isMap_shouldReturnTrue_whenClassIsMap() {
+		boolean result = ReflectionUtil.isMap(HashMap.class);
 
-        assertFalse(result);
-    }
+		assertTrue(result);
+	}
 
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    static class ParentTestClass {
-        protected String parentName;
-        protected String nonStaticField;
-    }
+	@Test
+	void isMap_shouldReturnFalse_whenClassIsNotMap() {
+		boolean result = ReflectionUtil.isMap(TestClass.class);
 
-    @Getter
-    @Setter
-    static class TestClass extends ParentTestClass {
-        private String name;
-        private static String staticField;
-        private final static String FINAL_STATIC_FIELD = "originalValueOfFinalStaticField";
+		assertFalse(result);
+	}
 
-        @Override
-        public String toString() {
-            return FINAL_STATIC_FIELD;
-        }
-    }
+	@Test
+	void isArray_shouldReturnTrue_whenFieldIsArray() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("ints");
 
-    static abstract class TestAbstractClass {
-        protected String abstractClassField;
+		boolean result = ReflectionUtil.isArray(field);
 
-        public abstract String getHello();
-    }
+		assertTrue(result);
+	}
 
-    static final class TestFinalClass {
-    }
+	@Test
+	void isArray_shouldReturnFalse_whenFieldIsNotArray() throws NoSuchFieldException {
+		Field field = TestTypesClass.class.getDeclaredField("string");
 
-    class TestNonStaticNonFinalInnerClass {
-    }
+		boolean result = ReflectionUtil.isArray(field);
 
-    static class TestTypesClass {
-        private String string;
-        private Set<String> set;
-        private List<String> list;
-        private Map<String, Object> map;
-        private Integer[] integers;
-        private int[] ints;
-    }
+		assertFalse(result);
+	}
 
-    interface TestInterface {
-        String sayHello();
-    }
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	static class ParentTestClass {
+		protected String parentName;
+		protected String nonStaticField;
+	}
 
-    enum TestEnum {
-        FIRST
-    }
+	@Getter
+	@Setter
+	static class TestClass extends ParentTestClass {
+		private String name;
+		private static String staticField;
+		private final static String FINAL_STATIC_FIELD = "originalValueOfFinalStaticField";
 
-    record TestRecord(String name) {
-    }
+		@Override
+		public String toString() {
+			return FINAL_STATIC_FIELD;
+		}
+	}
+
+	static abstract class TestAbstractClass {
+		protected String abstractClassField;
+
+		public abstract String getHello();
+	}
+
+	@Getter
+	@AllArgsConstructor
+	static class TestParam {
+		private String param;
+	}
+
+	@Getter
+	@AllArgsConstructor
+	static class TestInterfaceParam {
+		private TestInterface param;
+	}
+
+	static final class TestFinalClass {
+	}
+
+	class TestNonStaticNonFinalInnerClass {
+	}
+
+	static class TestTypesClass {
+		private String string;
+		private Set<String> set;
+		private List<String> list;
+		private Map<String, Object> map;
+		private Integer[] integers;
+		private int[] ints;
+	}
+
+	interface TestInterface {
+		String sayHello();
+	}
+
+	static class TestInterfaceImpl implements TestInterface {
+
+		@Override
+		public String sayHello() {
+			return "hello";
+		}
+	}
+
+	enum TestEnum {
+		FIRST
+	}
+
+	record TestRecord(String name) {
+	}
 }
